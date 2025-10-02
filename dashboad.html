@@ -13,14 +13,14 @@
 </head>
 <body>
   <div class="container my-4">
-    <h2 class="text-center mb-4">📊 Dashboard Sekolah</h2>
+    <h2 class="text-center mb-4">📊 Dashboard SDN Tanah Tinggi 03</h2>
     
     <div class="row">
       <!-- Pie Chart Guru -->
       <div class="col-md-6 mb-4">
         <div class="card shadow">
           <div class="card-body">
-            <h5 class="card-title text-center">Jumlah Guru</h5>
+            <h5 class="card-title text-center">Jumlah Guru 14</h5>
             <canvas id="guruChart"></canvas>
           </div>
         </div>
@@ -30,7 +30,7 @@
       <div class="col-md-6 mb-4">
         <div class="card shadow">
           <div class="card-body">
-            <h5 class="card-title text-center">Jumlah Murid</h5>
+            <h5 class="card-title text-center">Jumlah Murid 360</h5>
             <canvas id="muridChart"></canvas>
           </div>
         </div>
@@ -95,9 +95,9 @@
 
     // Data Guru
     const guruData = {
-      labels: ["CPNS", "PPPK"],
+      labels: ["CPNS", "PPPK","KKI"],
       datasets: [{
-        data: [10, 15], // ganti sesuai data
+        data: [8, 5,1], // ganti sesuai data
         backgroundColor: ["#36A2EB", "#FF6384"]
       }]
     };
@@ -147,3 +147,4 @@
   </script>
 </body>
 </html>
+
