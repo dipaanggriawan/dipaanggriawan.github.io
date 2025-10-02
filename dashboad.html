@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Sekolah</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .card { border-radius: 15px; }
+    .card-title { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container my-4">
+    <h2 class="text-center mb-4">📊 Dashboard Sekolah</h2>
+    
+    <div class="row">
+      <!-- Pie Chart Guru -->
+      <div class="col-md-6 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title text-center">Jumlah Guru</h5>
+            <canvas id="guruChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pie Chart Murid -->
+      <div class="col-md-6 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title text-center">Jumlah Murid</h5>
+            <canvas id="muridChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bar Chart Murid per Kelas -->
+    <div class="card shadow mb-4">
+      <div class="card-body">
+        <h5 class="card-title text-center">Jumlah Murid per Kelas</h5>
+        <canvas id="kelasChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Tabel Murid -->
+    <div class="card shadow">
+      <div class="card-body">
+        <h5 class="card-title text-center">Tabel Murid per Kelas</h5>
+        <table class="table table-bordered table-striped text-center">
+          <thead class="table-dark">
+            <tr>
+              <th>Kelas</th>
+              <th>Jumlah Murid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Kelas 1</td><td>30</td></tr>
+            <tr><td>Kelas 2</td><td>28</td></tr>
+            <tr><td>Kelas 3</td><td>32</td></tr>
+            <tr><td>Kelas 4</td><td>25</td></tr>
+            <tr><td>Kelas 5</td><td>27</td></tr>
+            <tr><td>Kelas 6</td><td>29</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </div>
+  
+  <script>
+    // Plugin persentase di Pie Chart
+    const getPercentPlugin = {
+      id: 'percentage',
+      afterDraw(chart) {
+        const {ctx} = chart;
+        ctx.save();
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((element, index) => {
+            const data = dataset.data[index];
+            const total = dataset.data.reduce((a, b) => a + b, 0);
+            const percent = ((data / total) * 100).toFixed(1) + "%";
+            const {x, y} = element.tooltipPosition();
+            ctx.fillStyle = "black";
+            ctx.font = "bold 12px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(percent, x, y);
+          });
+        });
+      }
+    };
+
+    // Data Guru
+    const guruData = {
+      labels: ["CPNS", "PPPK"],
+      datasets: [{
+        data: [10, 15], // ganti sesuai data
+        backgroundColor: ["#36A2EB", "#FF6384"]
+      }]
+    };
+    new Chart(document.getElementById("guruChart"), {
+      type: "pie",
+      data: guruData,
+      options: { responsive: true },
+      plugins: [getPercentPlugin]
+    });
+
+    // Data Murid (Pie)
+    const muridData = {
+      labels: ["Laki-laki", "Perempuan"],
+      datasets: [{
+        data: [80, 90], // ganti sesuai data
+        backgroundColor: ["#4CAF50", "#FFC107"]
+      }]
+    };
+    new Chart(document.getElementById("muridChart"), {
+      type: "pie",
+      data: muridData,
+      options: { responsive: true },
+      plugins: [getPercentPlugin]
+    });
+
+    // Data Murid per Kelas (Bar Chart)
+    const kelasLabels = ["Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"];
+    const kelasData = [30, 28, 32, 25, 27, 29]; // ganti sesuai data
+    new Chart(document.getElementById("kelasChart"), {
+      type: "bar",
+      data: {
+        labels: kelasLabels,
+        datasets: [{
+          label: "Jumlah Murid",
+          data: kelasData,
+          backgroundColor: "#36A2EB"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
