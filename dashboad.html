@@ -55,21 +55,22 @@
               <th>Kelas</th>
               <th>Perempuan</th>
               <th>Laki-Laki</th>
+              <th>Jumlah</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>Kelas 1A</td><td>13</td><td>14</td></tr>
-            <tr><td>Kelas 1B</td><td>11</td><td>16</td></tr>
-            <tr><td>Kelas 2A</td><td>16</td><td>16</td></tr>
-            <tr><td>Kelas 2B</td><td>16</td><td>16</td></tr>
-            <tr><td>Kelas 3A</td><td>15</td><td>17</td></tr>
-            <tr><td>Kelas 3B</td><td>19</td><td>12</td></tr>
-            <tr><td>Kelas 4A</td><td>12</td><td>17</td></tr>
-            <tr><td>Kelas 4B</td><td>12</td><td>15</td></tr>
-            <tr><td>Kelas 5A</td><td>15</td><td>11</td></tr>
-            <tr><td>Kelas 5B</td><td>13</td><td>14</td></tr>
-            <tr><td>Kelas 6A</td><td>21</td><td>14</td></tr>
-            <tr><td>Kelas 6B</td><td>20</td><td>15</td></tr>
+            <tr><td>Kelas 1A</td><td>13</td><td>14</td><td>27</td></tr>
+            <tr><td>Kelas 1B</td><td>11</td><td>16</td><td>27</td></tr>
+            <tr><td>Kelas 2A</td><td>16</td><td>16</td><td>32</td></tr>
+            <tr><td>Kelas 2B</td><td>16</td><td>16</td><td>32</td></tr>
+            <tr><td>Kelas 3A</td><td>15</td><td>17</td><td>32</td></tr>
+            <tr><td>Kelas 3B</td><td>19</td><td>12</td><td>31</td></tr>
+            <tr><td>Kelas 4A</td><td>12</td><td>17</td><td>29</td></tr>
+            <tr><td>Kelas 4B</td><td>12</td><td>15</td><td>27</td></tr>
+            <tr><td>Kelas 5A</td><td>15</td><td>11</td><td>26</td></tr>
+            <tr><td>Kelas 5B</td><td>13</td><td>14</td><td>27</td></tr>
+            <tr><td>Kelas 6A</td><td>21</td><td>14</td><td>35</td></tr>
+            <tr><td>Kelas 6B</td><td>20</td><td>15</td><td>35</td></tr>
           </tbody>
         </table>
       </div>
@@ -131,8 +132,8 @@
     });
 
     // Data Murid per Kelas (Bar Chart)
-    const kelasLabels = ["Kelas 1A","Kelas 1B", "Kelas 2A", "Kelas 2B","Kelas 3A",  "Kelas 3B", "Kelas 4A","Kelas 4B", "Kelas 5A","Kelas 5B", "Kelas 6A", "Kelas 6B"];
-    const kelasData = [27,27,32, 31, 30, 30, 28, 27,26,26,35,35]; // ganti sesuai data
+    const kelasLabels = ["Kelas 1", "Kelas 2","Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"];
+    const kelasData = [54,64,63,56,53,70]; // ganti sesuai data
     new Chart(document.getElementById("kelasChart"), {
       type: "bar",
       data: {
@@ -154,6 +155,7 @@
   </script>
 </body>
 </html>
+
 
 
 
