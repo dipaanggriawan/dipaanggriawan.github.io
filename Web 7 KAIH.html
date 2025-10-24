@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grafik Aktivitas Siswa</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: #f7f8fc;
+      margin: 20px;
+      color: #333;
+    }
+    h2, h3, h4 {
+      text-align: center;
+      color: #333;
+    }
+    canvas {
+      display: block;
+      margin: 30px auto;
+      width: 100%;
+      max-width: 1300px;
+      height: 500px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    }
+
+    /* 🟢 Ukuran pie chart dibuat sedang */
+    #chartPie {
+      max-width: 600px;   /* sebelumnya mengikuti bar chart, sekarang lebih kecil */
+      height: 400px;
+      padding: 20px;
+    }
+
+    #kelasSelectBar, #kelasSelectPie {
+      display: block;
+      margin: 15px auto 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    table {
+      border-collapse: collapse;
+      margin: 40px auto;
+      width: 95%;
+      background: #fff;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #A8DADC;
+      color: #333;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h2>📊 Grafik Aktivitas Siswa Berdasarkan Kelas</h2>
+  <select id="kelasSelectBar"></select>
+  <canvas id="chartAktivitas"></canvas>
+
+  <h3>🍩 Persentase Aktivitas Berdasarkan Kelas</h3>
+  <select id="kelasSelectPie"></select>
+  <canvas id="chartPie"></canvas>
+
+  <h4>📋 Rekap Aktivitas per Kelas</h4>
+  <div id="rekapTabel"></div>
+
+  <script>
+    const sheetUrl =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfBDh3bxjT6yTAaJwn01PSY9WhhENs4DfiSTjpIcEpWJBxy-A9EAoWrF1kBeqAdUpzlx4GrsceFw6r/pub?gid=885679622&single=true&output=csv";
+
+    let chartBar, chartPie;
+    const softColors = [
+      "#A8DADC", "#F4A261", "#E76F51", "#2A9D8F", "#E9C46A",
+      "#9D4EDD", "#F1C0E8", "#A2D2FF", "#BDE0FE", "#FFC8DD"
+    ];
+
+    async function loadSheetData() {
+      const res = await fetch(sheetUrl);
+      const csvText = await res.text();
+      const parsed = Papa.parse(csvText, { header: true });
+      const data = parsed.data.filter(r => r.Kelas);
+
+      const allHeaders = Object.keys(data[0]);
+      const aktivitasHeaders = allHeaders.slice(4);
+      const semuaKelas = [...new Set(data.map(r => r.Kelas.trim()))];
+
+      const kelasSelectBar = document.getElementById("kelasSelectBar");
+      const kelasSelectPie = document.getElementById("kelasSelectPie");
+      const dropdownOptions = `<option value="ALL">Semua Kelas</option>` +
+        semuaKelas.map(k => `<option value="${k}">${k}</option>`).join("");
+      kelasSelectBar.innerHTML = dropdownOptions;
+      kelasSelectPie.innerHTML = dropdownOptions;
+
+      updateBarChart(data, "ALL", aktivitasHeaders, semuaKelas);
+      updatePieChart(data, "ALL", aktivitasHeaders);
+      buatTabelRekap(data, semuaKelas, aktivitasHeaders);
+
+      kelasSelectBar.addEventListener("change", e => {
+        updateBarChart(data, e.target.value, aktivitasHeaders, semuaKelas);
+      });
+      kelasSelectPie.addEventListener("change", e => {
+        updatePieChart(data, e.target.value, aktivitasHeaders);
+      });
+    }
+
+    function updateBarChart(data, kelas, aktivitasHeaders, semuaKelas) {
+      let filtered = (kelas === "ALL") ? data : data.filter(r => r.Kelas.trim() === kelas);
+      const counts = aktivitasHeaders.map(aktivitas =>
+        filtered.filter(r => (r[aktivitas] || "").trim().toLowerCase() === "ya").length
+      );
+
+      const ctxBar = document.getElementById("chartAktivitas").getContext("2d");
+      if (chartBar) chartBar.destroy();
+
+      chartBar = new Chart(ctxBar, {
+        type: "bar",
+        data: {
+          labels: aktivitasHeaders,
+          datasets: [{
+            label: kelas === "ALL" ? "Semua Kelas" : `Kelas ${kelas}`,
+            data: counts,
+            backgroundColor: aktivitasHeaders.map((_, i) => softColors[i % softColors.length])
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              ticks: {
+                color: "#333",
+                font: { size: 13 },
+                autoSkip: false,
+                maxRotation: 45,
+                minRotation: 45
+              },
+              title: { display: true, text: "Aktivitas", color: "#333" }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 },
+              title: { display: true, text: "Jumlah Siswa Menjawab 'Ya'", color: "#333" }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: kelas === "ALL" ? "Grafik Semua Kelas" : `Grafik Kelas ${kelas}`,
+              color: "#333",
+              font: { size: 18 }
+            },
+            legend: { display: false }
+          },
+          layout: { padding: { bottom: 30 } }
+        }
+      });
+    }
+
+    function updatePieChart(data, kelas, aktivitasHeaders) {
+      let filtered = (kelas === "ALL") ? data : data.filter(r => r.Kelas.trim() === kelas);
+      const totalAktivitas = aktivitasHeaders.map(aktivitas =>
+        filtered.filter(r => (r[aktivitas] || "").trim().toLowerCase() === "ya").length
+      );
+
+      const ctxPie = document.getElementById("chartPie").getContext("2d");
+      if (chartPie) chartPie.destroy();
+
+      chartPie = new Chart(ctxPie, {
+        type: "pie",
+        data: {
+          labels: aktivitasHeaders,
+          datasets: [{
+            data: totalAktivitas,
+            backgroundColor: aktivitasHeaders.map((_, i) => softColors[i % softColors.length]),
+            borderColor: "#fff",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: kelas === "ALL" ? "Semua Kelas" : `Kelas ${kelas}`,
+              color: "#333",
+              font: { size: 18 }
+            },
+            legend: { position: "right" },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.label}: ${ctx.formattedValue} siswa`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function buatTabelRekap(data, semuaKelas, aktivitasHeaders) {
+      let html = `<table><thead><tr><th>Aktivitas</th>`;
+      semuaKelas.forEach(k => html += `<th>${k}</th>`);
+      html += `<th>Total Semua Kelas</th></tr></thead><tbody>`;
+
+      aktivitasHeaders.forEach(aktivitas => {
+        html += `<tr><td>${aktivitas}</td>`;
+        let totalAll = 0;
+        semuaKelas.forEach(k => {
+          const count = data.filter(r =>
+            r.Kelas.trim() === k && (r[aktivitas] || "").trim().toLowerCase() === "ya"
+          ).length;
+          totalAll += count;
+          html += `<td>${count}</td>`;
+        });
+        html += `<td><b>${totalAll}</b></td></tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById("rekapTabel").innerHTML = html;
+    }
+
+    loadSheetData();
+  </script>
+</body>
+</html>
